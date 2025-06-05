@@ -42,34 +42,34 @@ const mesas = [
   ];
   
 
-export default function Mesas() {
-  return (
-    <div>
-      <Header />
-      <main className="container mx-auto px-4 py-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">Gestión de Mesas</h2>
-          <div className="flex space-x-4">
-            <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm" onClick={() => window.location.href = 'reservaciones.html'}>Reservaciones</button>
-            <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm" onClick={() => window.location.href = 'menu.html'}>Menú</button>
-            <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm" onClick={() => window.location.href = 'ordenes.html'}>Órdenes</button>
+  export default function Mesas() {
+    return (
+      <div>
+        <Header />
+        <main className="container mx-auto px-4 py-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold text-gray-800">Gestión de Mesas</h2>
+            <div className="flex space-x-4">
+              <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm" onClick={() => window.location.href = 'reservaciones.html'}>Reservaciones</button>
+              <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm" onClick={() => window.location.href = 'menu.html'}>Menú</button>
+              <button className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm" onClick={() => window.location.href = 'ordenes.html'}>Órdenes</button>
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {mesas.map(mesa => (
-            <MesaCard
-            key={mesa.id}
-            id={mesa.id}
-            nombre={mesa.nombre}
-            estado={mesa.estado}
-            capacidad={mesa.capacidad}
-            orden={mesa.orden}
-            reservacion={mesa.reservacion}
-          />
-          
-          ))}
-        </div>
-      </main>
-    </div>
-  );
-}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {mesas.map(mesa => (
+              <MesaCard
+                key={mesa.id}
+                id={mesa.id}
+                nombre={mesa.nombre}
+                estado={mesa.estado}
+                capacidad={mesa.capacidad}
+                orden={mesa.orden}
+                reservacion={mesa.reservacion}
+                currentOrderId={mesa.currentOrderId}
+              />
+            ))}
+          </div>
+        </main>
+      </div>
+    );
+  }

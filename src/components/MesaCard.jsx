@@ -1,8 +1,51 @@
-// src/components/MesaCard.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function MesaCard({ id, nombre, estado, capacidad, orden }) {
+export default function MesaCard({ id, nombre, estado, capacidad, orden, reservacion, currentOrderId }) {
   const [open, setOpen] = useState(false);
+  const [showMenuModal, setShowMenuModal] = useState(false);
+  const [menuItems, setMenuItems] = useState([]);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [qty, setQty] = useState(1);
+
+  const token = localStorage.getItem("token");
+
+  
+  useEffect(() => {
+    if (showMenuModal) {
+      fetch("http://localhost:8080/products/search?q=", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Error al obtener productos");
+          return res.json();
+        })
+        .then(data => setMenuItems(data))
+        .catch(err => {
+          console.error("Error al cargar productos", err);
+          alert("No se pudieron cargar los productos");
+        });
+    }
+  }, [showMenuModal]);
+
+
+  const agregarProducto = () => {
+    if (!selectedProductId || !currentOrderId) return;
+
+    fetch(`http://localhost:8080/waiter/orders/${currentOrderId}/items?productId=${selectedProductId}&qty=${qty}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Error al agregar producto");
+        alert("Producto agregado");
+        setShowMenuModal(false);
+      })
+      .catch(err => alert("Error: " + err.message));
+  };
 
   const statusColors = {
     Disponible: "bg-green-100 text-green-800",
@@ -70,13 +113,62 @@ export default function MesaCard({ id, nombre, estado, capacidad, orden }) {
           </div>
         )}
 
-
-        
-
         <button className="mt-3 w-full bg-red-600 hover:bg-red-700 text-white py-1 rounded text-sm">
           {buttonText[estado]}
         </button>
+
+        {estado === "Ocupada" && (
+          <button
+            className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white py-1 rounded text-sm"
+            onClick={() => setShowMenuModal(true)}
+          >
+            Agregar Producto
+          </button>
+        )}
       </div>
+
+      {/* Modal */}
+      {showMenuModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-96 shadow-lg relative">
+            <button onClick={() => setShowMenuModal(false)} className="absolute top-2 right-3 text-gray-500 hover:text-black">&times;</button>
+            <h2 className="text-lg font-semibold mb-4">Agregar producto</h2>
+
+            <label className="block mb-2">
+              <span className="text-sm">Producto:</span>
+              <select
+                className="w-full border p-2 rounded"
+                onChange={e => setSelectedProductId(e.target.value)}
+                defaultValue=""
+              >
+                <option value="" disabled>Selecciona un producto</option>
+                {menuItems.map(p => (
+                  <option key={p.id} value={p.id}>{p.name} - ${p.price}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block mb-4">
+              <span className="text-sm">Cantidad:</span>
+              <input
+                type="number"
+                min="1"
+                value={qty}
+                onChange={e => setQty(e.target.value)}
+                className="w-full border p-2 rounded"
+              />
+            </label>
+
+            <button
+              onClick={agregarProducto}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full"
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
